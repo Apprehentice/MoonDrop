@@ -70,6 +70,10 @@ function MoonDrop:initialize()
       local suffix = u:getAddress():match(".*(!.*)")
       u:setAddress(newnick .. suffix)
     end
+
+    if txt.nick_from_address(prefix):lower() == self.nick:lower() then
+      self.nick = newnick
+    end
   end)
 
   self:on("PING", function(self, prefix, echo)
