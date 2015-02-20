@@ -362,6 +362,7 @@ function MoonDrop:connect(server, port, pass)
 
     if self._ready then self:fire("tick") end
   end
+  self:fire("disconnect")
   self._socket:close()
 
   if not self._quit and err ~= "closed" then
