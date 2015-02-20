@@ -343,7 +343,7 @@ function MoonDrop:connect(server, port, pass)
 
       self:fire("raw", fullmsg)
       self:fire(command, prefix, unpack(args))
-    end
+    end)
 
     -- Some servers require you respond to a PING before doing anything.
     -- I have no idea if waiting 5 seconds here is necessary, but
@@ -362,14 +362,19 @@ function MoonDrop:connect(server, port, pass)
 
     if self._ready then self:fire("tick") end
   end
+  self._socket:close(
 
   if not self._quit then
     error(tostring(err))
   end
 end
 
-function MoonDrop:quit()
+function MoonDrop:disconnect()
   self._quit = true
+end
+
+function MoonDrop:quit(reason)
+  self:send("QUIT :" .. (reason or ""))
 end
 
 return MoonDrop
