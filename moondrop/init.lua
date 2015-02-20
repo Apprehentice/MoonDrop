@@ -364,7 +364,7 @@ function MoonDrop:connect(server, port, pass)
   end
   self._socket:close()
 
-  if not self._quit then
+  if not self._quit and err ~= "closed" then
     error(tostring(err))
   end
 end
