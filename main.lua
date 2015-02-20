@@ -23,7 +23,7 @@ Client:on("ready", function(self)
     self:on("PRIVMSG", function(self, user, message)
       if message == "Go away, MoonDrop!" then
         self:message("Okay, " .. txt.nick_from_address(user) .. "!")
-        self:getClient():quit()
+        self:getClient():quit(txt.nick_from_address(user) .. " said to go away!")
       end
     end)
   end)
