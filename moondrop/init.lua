@@ -343,7 +343,7 @@ function MoonDrop:connect(server, port, pass)
 
       self:fire("raw", fullmsg)
       self:fire(command, prefix, unpack(args))
-    end)
+    end
 
     -- Some servers require you respond to a PING before doing anything.
     -- I have no idea if waiting 5 seconds here is necessary, but
