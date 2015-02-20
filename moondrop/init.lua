@@ -12,7 +12,7 @@ function MoonDrop:initialize()
   self.mode = 0
   self.server = ""
   self.port = 0
-  self.pass = ""
+  self.password = ""
 
   self.interval = 0.333
 
@@ -293,13 +293,23 @@ function MoonDrop:fireChannel(event, channel, ...)
 end
 
 function MoonDrop:connect(server, port, pass)
+  self.server = server
+  self.port = port
+  self.password = pass
+
   local err
   self._socket = socket.tcp()
   local res, err = self._socket:connect(server, port)
   assert(res, "Failed to connect to server (" .. tostring(err) .. ")")
 
   self._socket:settimeout(0)
+  if pass then
+    logger:info("-> PASS " .. pass)
+    self._socket:send("PASS " .. pass .. "\n")
+  end
+  logger:info("-> NICK " .. self.nick)
   self._socket:send("NICK " .. self.nick .. "\n")
+  logger:info("-> USER " .. self.user .. " " .. self.mode .. " * :" .. self.realName)
   self._socket:send("USER " .. self.user .. " " .. self.mode .. " * :" .. self.realName .. "\n")
   logger:info("Firing connect triggers...")
   self:fire("connect")
@@ -336,19 +346,26 @@ function MoonDrop:connect(server, port, pass)
       end
       table.insert(args, trailing)
 
-      local command = args[1]
+      command = args[1]
+
       table.remove(args, 1)
 
       logger:info("<- " .. fullmsg)
 
       self:fire("raw", fullmsg)
       self:fire(command, prefix, unpack(args))
+
+      if command == "PING" and not self._ready then
+        logger:info("Bot is ready!")
+        self._ready = true
+        self:fire("ready")
+      end
     end
 
     -- Some servers require you respond to a PING before doing anything.
     -- I have no idea if waiting 5 seconds here is necessary, but
     -- I don't think it hurts anything, either.
-    if (command == "PING" or os.time() - self._connectTime >= 5) and not self._ready then
+    if os.time() - self._connectTime >= 5 and not self._ready then
       logger:info("Bot is ready!")
       self._ready = true
       self:fire("ready")
@@ -360,7 +377,9 @@ function MoonDrop:connect(server, port, pass)
       end
     end
 
-    if self._ready then self:fire("tick") end
+    if self._ready then
+      self:fire("tick")
+    end
   end
   self:fire("disconnect")
   self._socket:close()

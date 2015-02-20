@@ -189,7 +189,7 @@ function Stream:initialize(client, name, password, prefix, chantypes, chanmodes)
   end
 
   self:on("JOIN", function(self, prefix)
-    if txt.nick_from_address(prefix) == self:getClient():getNick() and not self._ready then
+    if txt.nick_from_address(prefix):lower() == self:getClient():getNick():lower() and not self._ready then
       self._ready = true
       self:fire("ready")
     end
@@ -345,6 +345,11 @@ function Stream:initialize(client, name, password, prefix, chantypes, chanmodes)
       end
     end
   end)
+
+  if not self._isChannel then
+    self._ready = true
+    self:fire("ready")
+  end
 end
 
 function Stream:on(event, func)
