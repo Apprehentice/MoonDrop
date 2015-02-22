@@ -112,10 +112,6 @@ function Stream:initialize(client, name, password, prefix, chantypes, chanmodes)
     }
   end
 
-  if string.sub(self._name, 1, 1) == "#" then
-    self._client:send("JOIN " .. self._name .. " " .. self._password)
-  end
-
   local function partquit(self, prefix)
     for k, _ in pairs(self.nicks) do
       local n = txt.nick_from_address(prefix)
@@ -349,6 +345,8 @@ function Stream:initialize(client, name, password, prefix, chantypes, chanmodes)
   if not self._isChannel then
     self._ready = true
     self:fire("ready")
+  else
+    self._client:send("JOIN " .. self._name .. " " .. self._password)
   end
 end
 
